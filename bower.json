@@ -1,0 +1,26 @@
+{
+  "name": "swipeSlider",
+  "version": "1.0.0",
+  "homepage": "https://github.com/dbrekalo/swipeSlider",
+  "authors": [
+    "Damir Brekalo <dbrekalo@gmail.com>"
+  ],
+  "description": "Swipe.js wrapper that enables dot and arrow navigation as small and lightweight jQuery plugin.",
+  "main": "dist/swipeSlider.min.js",
+  "keywords": [
+    "swipe",
+    "slider",
+    "swipeslider"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "swipe": "~2.0.0"
+  }
+}
