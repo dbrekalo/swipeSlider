@@ -38,7 +38,9 @@ $.swipeSlider.defaults = {
 	arrowPrevText: 'Previous',
 	dotsWrapClass: 'sliderDots',
 	dotWrapClass: 'dotWrap',
-	dotClass: 'dot'
+	dotClass: 'dot',
+
+	onDotsCreate: false
 
 };
 ```
