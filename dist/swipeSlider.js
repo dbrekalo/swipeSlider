@@ -128,6 +128,8 @@
 
 			});
 
+			this.options.onDotsCreate && this.options.onDotsCreate(this.$dots, this.$dotsElems, this);
+
 		},
 
 		setupPages: function(){
@@ -187,7 +189,9 @@
 		arrowPrevText: 'Previous',
 		dotsWrapClass: 'sliderDots',
 		dotWrapClass: 'dotWrap',
-		dotClass: 'dot'
+		dotClass: 'dot',
+
+		onDotsCreate: false
 
 	};
 
