@@ -123,7 +123,6 @@
 				}
 
 				this.$dotsElems = this.$dots.find('.' + this.options.dotWrapClass);
-				this.$dotsElems.removeClass('active').eq( index % this.slidesLength ).addClass('active');
 
 				this.$dots.appendTo( this.$el ).on( 'click' , '.' + this.options.dotWrapClass, function(){
 
