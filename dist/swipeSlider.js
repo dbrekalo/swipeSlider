@@ -25,14 +25,7 @@
 
 			this.setupSwipe();
 
-			if ( this.slidesLength > 1 ) {
-
-				if ( this.options.enableArrows ) { this.setupArrows(); }
-				if ( this.options.enableDots ) { this.setupDotNavigation(); }
-				if ( this.options.showPages ) { this.setupPages(); }
-				this.setActiveElemContext( this.options.startSlide );
-
-			}
+			this.slidesLength > 1 && this.setActiveElemContext( this.options.startSlide );
 
 		},
 
@@ -61,10 +54,53 @@
 			currentElem.next().addClass('next');
 			currentElem.prev().addClass('prev');
 
-			if( this.options.enableDots ) { this.$dotsElems.removeClass('active').eq( index % this.slidesLength ).addClass('active'); }
-			if( this.options.showPages ) { this.$pages.text( (index + 1) + '/' + this.slidesLength ); }
+			this.options.enableDots && this.setupDotNavigation(index);
+			this.options.showPages && this.setupPages(index);
+			this.options.enableArrows && this.setupArrows(index);
 
-			if ( !this.options.continuous && this.options.enableArrows ){
+		},
+
+		setupArrows: function(index){
+
+			var self = this;
+
+			if (!this.$arrows) {
+
+				this.$arrows = $(
+					'<a class="' + this.options.arrowClassNext + ' next"><span>' + this.options.arrowNextText + '</span></a>' +
+					'<a class="' + this.options.arrowClassPrev + ' prev"><span>' + this.options.arrowPrevText + '</span></a>'
+				);
+
+				if ( this.options.wrapArrows ) {
+					this.$arrowsWrap = this.$arrows.wrapAll('<div class="sliderArrows">').parent().appendTo( this.$el );
+				} else {
+					this.$arrows.appendTo( this.$el );
+				}
+
+				this.$arrows.on('click', function(){
+
+					var $this = $(this);
+					if ( $this.hasClass('disabled') ) { return; }
+
+					self.$el.removeClass('dirNext dirPrev');
+
+					if ( $this.hasClass('next') ){
+
+						self.$el.addClass('dirNext');
+						self.swipeApi.next();
+
+					} else {
+
+						self.$el.addClass('dirPrev');
+						self.swipeApi.prev();
+
+					}
+
+				});
+
+			}
+
+			if ( !this.options.continuous && $.isNumeric(index)){
 
 				this.$arrows.removeClass('disabled');
 
@@ -72,69 +108,47 @@
 				if ( index === 0 ){ this.$arrows.filter('.prev').addClass('disabled'); }
 
 			}
-
 		},
 
-		setupArrows: function(){
+		setupDotNavigation: function(index){
 
 			var self = this;
-			this.$arrows = $('<a class="' + this.options.arrowClassNext + ' next"><span>' + this.options.arrowNextText + '</span></a><a class="' + this.options.arrowClassPrev + ' prev"><span>' + this.options.arrowPrevText + '</span></a>');
 
-			if ( this.options.wrapArrows ) {
-				this.$arrowsWrap = this.$arrows.wrapAll('<div class="sliderArrows">').parent().appendTo( this.$el );
-			} else {
-				this.$arrows.appendTo( this.$el );
-			}
+			if (!this.$dotsElems) {
 
-			this.$arrows.on('click', function(){
+				this.$dots = $('<div>').addClass(this.options.dotsWrapClass).addClass('num'+ this.slidesLength);
 
-				var $this = $(this);
-				if ( $this.hasClass('disabled') ) { return; }
-
-				self.$el.removeClass('dirNext dirPrev');
-
-				if ( $this.hasClass('next') ){
-
-					self.$el.addClass('dirNext');
-					self.swipeApi.next();
-
-				} else {
-
-					self.$el.addClass('dirPrev');
-					self.swipeApi.prev();
-
+				for ( var i = 0; i < this.slidesLength ; i++ ){
+					this.$dots.append('<a class="'+ this.options.dotWrapClass +' dot_wrap_'+ i +'" data-position="'+ i +'"><span class="'+ this.options.dotClass +'">'+ (i+1) +'</span></a> ');
 				}
 
-			});
-		},
+				this.$dotsElems = this.$dots.find('.' + this.options.dotWrapClass);
+				this.$dotsElems.removeClass('active').eq( index % this.slidesLength ).addClass('active');
 
-		setupDotNavigation: function(){
+				this.$dots.appendTo( this.$el ).on( 'click' , '.' + this.options.dotWrapClass, function(){
 
-			var self = this;
+					var $this = $(this);
+					if ( $this.hasClass('active') ) { return; }
+					self.swipeApi.slide( $this.data('position') );
 
-			this.$dots = $('<div>').addClass(this.options.dotsWrapClass).addClass('num'+ this.slidesLength);
+				});
 
-			for ( var i = 0; i < this.slidesLength ; i++ ){
-				this.$dots.append('<a class="'+ this.options.dotWrapClass +' dot_wrap_'+ i +'" data-position="'+ i +'"><span class="'+ this.options.dotClass +'">'+ (i+1) +'</span></a> ');
+				this.options.onDotsCreate && this.options.onDotsCreate(this.$dots, this.$dotsElems, this);
+
 			}
 
-			this.$dotsElems = this.$dots.find('.' + this.options.dotWrapClass);
-
-			this.$dots.appendTo( this.$el ).on( 'click' , '.' + this.options.dotWrapClass, function(){
-
-				var $this = $(this);
-				if ( $this.hasClass('active') ) { return; }
-				self.swipeApi.slide( $this.data('position') );
-
-			});
-
-			this.options.onDotsCreate && this.options.onDotsCreate(this.$dots, this.$dotsElems, this);
+			$.isNumeric(index) && this.$dotsElems.removeClass('active').eq( index % this.slidesLength ).addClass('active');
 
 		},
 
-		setupPages: function(){
+		setupPages: function(index){
 
-			this.$pages = $('<div class="sliderPages">'+ (this.options.startSlide + 1) +'/'+ this.slidesLength +'</div>').appendTo( this.$el );
+			if (typeof index === 'undefined') { index = this.options.startSlide + 1; }
+
+			var currentPage = index + 1 > this.slidesLength ? index % this.slidesLength + 1 : index + 1;
+
+			this.$pages = this.$pages || $('<div class="sliderPages">').appendTo( this.$el );
+			this.$pages.text(currentPage +'/'+ this.slidesLength);
 
 		},
 
