@@ -21,6 +21,6 @@
     "tests"
   ],
   "dependencies": {
-    "swipe": "~2.0.0"
+    "swipe": "86c96eaa3c6177f04330bb606f50049d39079b8e"
   }
 }
