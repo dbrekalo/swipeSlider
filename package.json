@@ -1,16 +1,40 @@
 {
-  "name": "swipeSloder",
+  "name": "swipeSlider",
   "version": "1.1.5",
+  "description": "Extended Swipe.js with dot, pages and arrow navigation",
+  "main": "src/swipeSlider.js",
+  "license": "MIT",
+  "author": {
+    "email": "dbrekalo@gmail.com",
+    "name": "Damir Brekalo"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/dbrekalo/swipeSlider"
   },
+  "keywords": [
+    "swipe",
+    "slider"
+  ],
+  "scripts": {
+    "watch": "grunt",
+    "build": "grunt build",
+    "bump:patch": "grunt bump:patch",
+    "bump:minor": "grunt bump:minor",
+    "bump:major": "grunt bump:major"
+  },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-copy": "^0.6.0",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-uglify": "^0.6.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "load-grunt-tasks": "^0.6.0"
+    "grunt": "^1.0.1",
+    "grunt-bump": "^0.8.0",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-uglify": "^3.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-eslint": "^20.0.0",
+    "load-grunt-tasks": "^3.5.2"
+  },
+  "dependencies": {
+    "jquery": ">=1.7",
+    "swipejs": "^2.2.10"
   }
 }

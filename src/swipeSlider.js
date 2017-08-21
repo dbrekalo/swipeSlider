@@ -1,215 +1,227 @@
-;(function($, Swipe){
+(function(factory) {
 
-	"use strict";
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery', 'swipejs'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        module.exports = factory(require('jquery'), require('swipejs'));
+    } else {
+        factory(window.jQuery, window.Swipe);
+    }
 
-	function SwipeSlider(el, options) {
+}(function($, Swipe) {
 
-		this.options = $.extend( {}, $.swipeSlider.defaults, options);
-		this.$el = $(el);
-		this.init();
+    function SwipeSlider(el, options) {
 
-	}
+        this.options = $.extend({}, SwipeSlider.defaults, options);
+        this.$el = $(el);
+        this.init();
 
-	SwipeSlider.prototype = {
+    }
 
-		init: function(){
+    SwipeSlider.prototype = {
 
-			this.$slider = this.options.sliderSelector ? this.$el.find( this.options.sliderSelector ) : this.$el;
-			this.$track = this.$slider.children().eq(0);
-			this.$slides = this.$track.children();
-			this.slidesLength = this.$slides.length;
+        init: function() {
 
-			this.$slider.addClass('swipe');
-			this.$track.addClass('swipe-wrap');
-			this.$slides.addClass('slide');
+            this.$slider = this.options.sliderSelector ? this.$el.find(this.options.sliderSelector) : this.$el;
+            this.$track = this.$slider.children().eq(0);
+            this.$slides = this.$track.children();
+            this.slidesLength = this.$slides.length;
 
-			this.setupSwipe();
+            this.$slider.addClass('swipe');
+            this.$track.addClass('swipe-wrap');
+            this.$slides.addClass('slide');
 
-			this.slidesLength > 1 && this.setActiveElemContext( this.options.startSlide );
+            this.setupSwipe();
 
-		},
+            if (this.slidesLength > 1) {
+                this.setActiveElemContext(this.options.startSlide);
+            }
 
-		setupSwipe: function(){
+        },
 
-			var self = this,
-				options = $.extend({}, this.options, {
-					callback: function(index, elem){
+        setupSwipe: function() {
 
-						self.setActiveElemContext( index );
-						if (self.options.callback ) { self.options.callback( index, elem ); }
+            var self = this;
+            var options = $.extend({}, this.options, {
+                callback: function(index, elem) {
 
-					}
-				});
+                    self.setActiveElemContext(index);
+                    self.options.callback && self.options.callback(index, elem);
 
-			this.swipeApi = new Swipe( this.$slider[0], options);
+                }
+            });
 
-		},
+            this.swipeApi = new Swipe(this.$slider[0], options);
 
-		setActiveElemContext: function( index ){
+        },
 
-			this.$slides.removeClass('active next prev');
-			var currentElem = this.$slides.eq( index );
+        setActiveElemContext: function(index) {
 
-			currentElem.addClass('active');
-			currentElem.next().addClass('next');
-			currentElem.prev().addClass('prev');
+            this.$slides.removeClass('active next prev');
+            var currentElem = this.$slides.eq(index);
 
-			this.options.enableDots && this.setupDotNavigation(index);
-			this.options.showPages && this.setupPages(index);
-			this.options.enableArrows && this.setupArrows(index);
+            currentElem.addClass('active');
+            currentElem.next().addClass('next');
+            currentElem.prev().addClass('prev');
 
-		},
+            this.options.enableDots && this.setupDotNavigation(index);
+            this.options.showPages && this.setupPages(index);
+            this.options.enableArrows && this.setupArrows(index);
 
-		setupArrows: function(index){
+        },
 
-			var self = this;
+        setupArrows: function(index) {
 
-			if (!this.$arrows) {
+            var self = this;
 
-				this.$arrows = $(
-					'<a class="' + this.options.arrowClassNext + ' next"><span>' + this.options.arrowNextText + '</span></a>' +
-					'<a class="' + this.options.arrowClassPrev + ' prev"><span>' + this.options.arrowPrevText + '</span></a>'
-				);
+            if (!this.$arrows) {
 
-				if ( this.options.wrapArrows ) {
-					this.$arrowsWrap = this.$arrows.wrapAll('<div class="sliderArrows">').parent().appendTo( this.$el );
-				} else {
-					this.$arrows.appendTo( this.$el );
-				}
+                this.$arrows = $(
+                    '<a class="' + this.options.arrowClassNext + ' next"><span>' + this.options.arrowNextText + '</span></a>' +
+                    '<a class="' + this.options.arrowClassPrev + ' prev"><span>' + this.options.arrowPrevText + '</span></a>'
+                );
 
-				this.$arrows.on('click', function(){
+                if (this.options.wrapArrows) {
+                    this.$arrowsWrap = $('<div class="sliderArrows"></div>').append(this.$arrows).appendTo(this.$el);
+                } else {
+                    this.$arrows.appendTo(this.$el);
+                }
 
-					var $this = $(this);
-					if ( self.isAnimating || $this.hasClass('disabled') ) { return; }
+                this.$arrows.on('click', function() {
 
-					self.isAnimating = true;
+                    var $this = $(this);
+                    if (self.isAnimating || $this.hasClass('disabled')) { return; }
 
-					self.$el.removeClass('dirNext dirPrev');
+                    self.isAnimating = true;
 
-					if ( $this.hasClass('next') ){
+                    self.$el.removeClass('dirNext dirPrev');
 
-						self.$el.addClass('dirNext');
-						self.swipeApi.next();
+                    if ($this.hasClass('next')) {
 
-					} else {
+                        self.$el.addClass('dirNext');
+                        self.swipeApi.next();
 
-						self.$el.addClass('dirPrev');
-						self.swipeApi.prev();
+                    } else {
 
-					}
+                        self.$el.addClass('dirPrev');
+                        self.swipeApi.prev();
 
-					setTimeout(function(){ self.isAnimating = false; }, self.options.speed);
+                    }
 
-				});
+                    setTimeout(function() { self.isAnimating = false; }, self.options.speed);
 
-			}
+                });
 
-			if ( !this.options.continuous && $.isNumeric(index)){
+            }
 
-				this.$arrows.removeClass('disabled');
+            if (!this.options.continuous && $.isNumeric(index)) {
 
-				if ( index === this.slidesLength-1 ){ this.$arrows.filter('.next').addClass('disabled'); }
-				if ( index === 0 ){ this.$arrows.filter('.prev').addClass('disabled'); }
+                this.$arrows.removeClass('disabled');
 
-			}
-		},
+                if (index === this.slidesLength-1) { this.$arrows.filter('.next').addClass('disabled'); }
+                if (index === 0) { this.$arrows.filter('.prev').addClass('disabled'); }
 
-		setupDotNavigation: function(index){
+            }
+        },
 
-			var self = this;
+        setupDotNavigation: function(index) {
 
-			if (!this.$dotsElems) {
+            var self = this;
 
-				this.$dots = $('<div>').addClass(this.options.dotsWrapClass).addClass('num'+ this.slidesLength);
+            if (!this.$dotsElems) {
 
-				for ( var i = 0; i < this.slidesLength ; i++ ){
-					this.$dots.append('<a class="'+ this.options.dotWrapClass +' dot_wrap_'+ i +'" data-position="'+ i +'"><span class="'+ this.options.dotClass +'">'+ (i+1) +'</span></a> ');
-				}
+                this.$dots = $('<div>').addClass(this.options.dotsWrapClass).addClass('num'+ this.slidesLength);
 
-				this.$dotsElems = this.$dots.find('.' + this.options.dotWrapClass);
+                for (var i = 0; i < this.slidesLength ; i++) {
+                    this.$dots.append('<a class="'+ this.options.dotWrapClass +' dot_wrap_'+ i +'" data-position="'+ i +'"><span class="'+ this.options.dotClass +'">'+ (i+1) +'</span></a> ');
+                }
 
-				this.$dots.appendTo( this.$el ).on( 'click' , '.' + this.options.dotWrapClass, function(){
+                this.$dotsElems = this.$dots.find('.' + this.options.dotWrapClass);
 
-					var $this = $(this);
-					if ( $this.hasClass('active') ) { return; }
-					self.swipeApi.slide( $this.data('position') );
+                this.$dots.appendTo(this.$el).on('click', '.' + this.options.dotWrapClass, function() {
 
-				});
+                    var $this = $(this);
+                    if ($this.hasClass('active')) { return; }
+                    self.swipeApi.slide($this.data('position'));
 
-				this.options.onDotsCreate && this.options.onDotsCreate(this.$dots, this.$dotsElems, this);
+                });
 
-			}
+                this.options.onDotsCreate && this.options.onDotsCreate(this.$dots, this.$dotsElems, this);
 
-			$.isNumeric(index) && this.$dotsElems.removeClass('active').eq( index % this.slidesLength ).addClass('active');
+            }
 
-		},
+            if ($.isNumeric(index)) {
+                this.$dotsElems.removeClass('active').eq(index % this.slidesLength).addClass('active');
+            }
 
-		setupPages: function(index){
+        },
 
-			if (typeof index === 'undefined') { index = this.options.startSlide + 1; }
+        setupPages: function(index) {
 
-			var currentPage = index + 1 > this.slidesLength ? index % this.slidesLength + 1 : index + 1;
+            if (typeof index === 'undefined') { index = this.options.startSlide + 1; }
 
-			this.$pages = this.$pages || $('<div class="sliderPages">').appendTo( this.$el );
-			this.$pages.text(currentPage +'/'+ this.slidesLength);
+            var currentPage = index + 1 > this.slidesLength ? index % this.slidesLength + 1 : index + 1;
 
-		},
+            this.$pages = this.$pages || $('<div class="sliderPages">').appendTo(this.$el);
+            this.$pages.text(currentPage +'/'+ this.slidesLength);
 
-		destroy: function(){
+        },
 
-			this.$arrows && this.$arrows.remove();
-			this.$arrowsWrap && this.$arrowsWrap.remove;
-			this.$dots && this.$dots.remove();
-			this.$pages && this.$pages.remove();
+        destroy: function() {
 
-			this.swipeApi.kill();
+            this.$arrows && this.$arrows.remove();
+            this.$arrowsWrap && this.$arrowsWrap.remove;
+            this.$dots && this.$dots.remove();
+            this.$pages && this.$pages.remove();
 
-			this.$slider.removeClass('swipe').removeAttr('style');
-			this.$track.removeClass('swipe-wrap').removeAttr('style');
-			this.$slides.removeClass('slide active next prev').removeAttr('style');
+            this.swipeApi.kill();
 
-			this.$el.data('swipeSlider', null);
+            this.$slider.removeClass('swipe').removeAttr('style');
+            this.$track.removeClass('swipe-wrap').removeAttr('style');
+            this.$slides.removeClass('slide active next prev').removeAttr('style');
 
-		}
-	};
+            this.$el.data('swipeSlider', null);
 
-	$.swipeSlider = SwipeSlider;
+        }
+    };
 
-	$.fn.swipeSlider = function( options ){
-		return this.each(function () {
-			if (!$.data(this, 'swipeSlider')) {
-				$.data(this, 'swipeSlider', new SwipeSlider( this, options ));
-			}
-		});
-	};
+    $.fn.swipeSlider = function(options) {
+        return this.each(function() {
+            if (!$.data(this, 'swipeSlider')) {
+                $.data(this, 'swipeSlider', new SwipeSlider(this, options));
+            }
+        });
+    };
 
-	$.swipeSlider.defaults = {
+    $.swipeSlider = $.SwipeSlider = SwipeSlider;
 
-		sliderSelector : null,
+    SwipeSlider.defaults = {
 
-		enableDots : true,
-		enableArrows: true,
-		showPages: false,
+        sliderSelector: null,
 
-		startSlide: 0,
-		speed: 600,
-		auto: 0,
-		continuous: false,
-		disableScroll: false,
-		stopPropagation: false,
-		callback: null,
+        enableDots: true,
+        enableArrows: true,
+        showPages: false,
 
-		wrapArrows: false,
-		arrowClassNext : 'sliderArrow',
-		arrowClassPrev : 'sliderArrow',
-		arrowNextText: 'Next',
-		arrowPrevText: 'Previous',
-		dotsWrapClass: 'sliderDots',
-		dotWrapClass: 'dotWrap',
-		dotClass: 'dot',
+        startSlide: 0,
+        speed: 600,
+        auto: 0,
+        continuous: false,
+        disableScroll: false,
+        stopPropagation: false,
+        callback: null,
 
-		onDotsCreate: false
+        wrapArrows: false,
+        arrowClassNext: 'sliderArrow',
+        arrowClassPrev: 'sliderArrow',
+        arrowNextText: 'Next',
+        arrowPrevText: 'Previous',
+        dotsWrapClass: 'sliderDots',
+        dotWrapClass: 'dotWrap',
+        dotClass: 'dot',
 
-	};
+        onDotsCreate: false
 
-})(window.jQuery, window.Swipe);
+    };
+
+}));

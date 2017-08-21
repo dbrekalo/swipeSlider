@@ -5,7 +5,7 @@
   "authors": [
     "Damir Brekalo <dbrekalo@gmail.com>"
   ],
-  "description": "Swipe.js wrapper that enables dot and arrow navigation as small and lightweight jQuery plugin.",
+  "description": "Extended Swipe.js with dot, pages and arrow navigation",
   "main": "dist/swipeSlider.min.js",
   "keywords": [
     "swipe",
@@ -19,8 +19,5 @@
     "bower_components",
     "test",
     "tests"
-  ],
-  "dependencies": {
-    "swipe": "86c96eaa3c6177f04330bb606f50049d39079b8e"
-  }
+  ]
 }
