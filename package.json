@@ -1,5 +1,5 @@
 {
-  "name": "swipeSlider",
+  "name": "swipe-slider",
   "version": "1.2.0",
   "description": "Extended Swipe.js with dot, pages and arrow navigation",
   "main": "src/swipeSlider.js",
