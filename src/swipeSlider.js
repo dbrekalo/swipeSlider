@@ -27,9 +27,9 @@
             this.$slides = this.$track.children();
             this.slidesLength = this.$slides.length;
 
-            this.$slider.addClass('swipe');
-            this.$track.addClass('swipe-wrap');
-            this.$slides.addClass('slide');
+            this.$slider.addClass(this.options.elementClass);
+            this.$track.addClass(this.options.trackClass);
+            this.$slides.addClass(this.options.slideClass);
 
             this.setupSwipe();
 
@@ -51,18 +51,19 @@
                 }
             });
 
-            this.swipeApi = new Swipe(this.$slider[0], options);
+            this.swipeApi = new Swipe(this.$slider.get(0), options);
 
         },
 
         setActiveElemContext: function(index) {
 
             this.$slides.removeClass('active next prev');
-            var currentElem = this.$slides.eq(index);
+            var $currentElem = this.$slides.eq(index);
 
-            currentElem.addClass('active');
-            currentElem.next().addClass('next');
-            currentElem.prev().addClass('prev');
+            $currentElem.addClass('active');
+
+            index + 1 < this.slidesLength && this.$slides.eq(index + 1).addClass('next');
+            index - 1 >= 0 && this.$slides.eq(index - 1).addClass('prev');
 
             this.options.enableDots && this.setupDotNavigation(index);
             this.options.showPages && this.setupPages(index);
@@ -133,16 +134,23 @@
                 this.$dots = $('<div>').addClass(this.options.dotsWrapClass).addClass('num'+ this.slidesLength);
 
                 for (var i = 0; i < this.slidesLength ; i++) {
-                    this.$dots.append('<a class="'+ this.options.dotWrapClass +' dot_wrap_'+ i +'" data-position="'+ i +'"><span class="'+ this.options.dotClass +'">'+ (i+1) +'</span></a> ');
+                    this.$dots.append(
+                        '<a class="'+ this.options.dotWrapClass +' dot_wrap_'+ i +'" data-position="'+ i +'">' +
+                            '<span class="'+ this.options.dotClass +'">'+ (i+1) +'</span>' +
+                        '</a> ');
                 }
 
-                this.$dotsElems = this.$dots.find('.' + this.options.dotWrapClass);
+                this.$dotsElems = this.$dots.children();
 
-                this.$dots.appendTo(this.$el).on('click', '.' + this.options.dotWrapClass, function() {
+                this.$dots.appendTo(this.$el).on('click', 'a', function(e) {
+
+                    e.preventDefault();
 
                     var $this = $(this);
-                    if ($this.hasClass('active')) { return; }
-                    self.swipeApi.slide($this.data('position'));
+
+                    if (!$this.hasClass('active')) {
+                        self.swipeApi.slide($this.data('position'));
+                    }
 
                 });
 
@@ -176,9 +184,9 @@
 
             this.swipeApi.kill();
 
-            this.$slider.removeClass('swipe').removeAttr('style');
-            this.$track.removeClass('swipe-wrap').removeAttr('style');
-            this.$slides.removeClass('slide active next prev').removeAttr('style');
+            this.$slider.removeClass(this.options.elementClass).removeAttr('style');
+            this.$track.removeClass(this.options.trackClass).removeAttr('style');
+            this.$slides.removeClass(this.options.slideClass + ' active next prev').removeAttr('style');
 
             this.$el.data('swipeSlider', null);
 
@@ -196,6 +204,10 @@
     $.swipeSlider = $.SwipeSlider = SwipeSlider;
 
     SwipeSlider.defaults = {
+
+        elementClass: 'swipe',
+        trackClass: 'swipe-wrap',
+        slideClass: 'slide',
 
         sliderSelector: null,
 
